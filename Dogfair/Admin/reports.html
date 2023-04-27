@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Reports</h1>
+     <table>
+        <tr>
+            <th>No of Dogs</th>
+            <th>No of Female Dogs</th>
+            <th>No of Male Dogs</th>
+            <th>Avg age of Dogs</th>
+        </tr>
+        <tbody id="reports">
+
+        </tbody>
+     </table>
+</body>
+</html>
+<script>
+      let reports=document.querySelector("#reports");
+      let TokenData= JSON.parse(localStorage.getItem("token")) || "";
+       console.log(TokenData)
+       if(!TokenData){
+            window.location.href= "./login.html"
+       }
+       
+     async function getData(){
+        try {
+           let resData=await fetch("http://localhost:8080/dogs")
+
+           let dogs=await resData.json()
+           DisplayCard(dogs)
+        } catch (error) {
+            console.log("error")
+        }      
+      }
+      getData();
+
+      function DisplayCard(data){
+        reports.innerHTML="";
+        
+        let male=data.filter((el)=>{
+            return el.gender=="male"
+        }).length;
+
+        let female=data.filter((el)=>{
+            return el.gender=="female"
+        }).length;
+
+         
+        // let totalSum=0;
+        // data.forEach(el => {
+        //     totalSum+=Number(el.age)
+        //  }) 
+         
+         let sum = data.reduce((acc,current)=>{
+                acc =  acc+Number(current.age)
+               return acc;
+         },0)
+
+          console.log(sum)
+        
+              let tr=document.createElement("tr");
+              let total=document.createElement("td");
+              total.innerHTML=data.length;
+              let Male=document.createElement("td");
+              Male.innerHTML= male;
+
+              let Female=document.createElement("td");
+              Female.innerHTML= female;
+
+              let Average=document.createElement("td");
+              Average.innerHTML=  sum
+              
+              tr.append(total,Male,Female , Average)
+              reports.append(tr);
+    }
+</script>

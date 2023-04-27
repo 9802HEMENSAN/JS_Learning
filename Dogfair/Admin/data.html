@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container{
+            display:  grid;
+            /* grid-template-columns: repeat(3,1fr); */         
+            grid-template-columns: repeat(auto-fill, minmax(350px, 2fr));
+            gap : 20px;
+            align-items: center;
+            text-align: center;
+        }
+        .sticky-element {
+            position: sticky;
+            top: 0px;      
+            background-color: chocolate;
+         }
+    </style>
+</head>
+<body>
+     <div class="sticky-element"> 
+    <h1>Dogs Data</h1>
+    <input type="text" oninput = search() id="searchbar" placeholder="Search Here">
+    <select id="sort_age" onchange=Sorting()>
+        <option value="all">Sort By Age</option>
+        <option value="asc">ASC</option>
+        <option value="desc">DESC</option>
+      </select>
+      <select id="filter_gender"  onchange=Filtering()>
+        <option value="all">Filter by gender</option>
+        <option value="male">male</option>
+        <option value="female">female</option>
+      </select>
+    </div>
+     <div class="container">
+          
+     </div>
+</body>
+</html>
+<script>
+      const container=document.querySelector(".container");
+
+      let TokenData= JSON.parse(localStorage.getItem("token")) || "";
+       console.log(TokenData)
+       if(!TokenData){
+            window.location.href= "./login.html"
+       }
+  let Data=[];
+  // JavaScript code
+  function search(){
+          let q=document.querySelector("input").value;
+          console.log(q)
+          let newData=Data.filter(function (elem){
+              return elem.name.toLowerCase().includes(q.toLowerCase())
+          })
+          DisplayCard(newData);
+  }
+
+   function Filtering(){
+      const selected=document.querySelector("#filter_gender").value;
+
+      if(selected=="all"){
+        DisplayCard(Data)
+      }else{
+        let filteredData=Data.filter((el)=> (
+             el.gender==selected
+        ))
+        DisplayCard(filteredData);
+      }
+   }    
+      
+   function Sorting(){
+    const age=document.querySelector("#sort_age").value;
+   console.log(age)
+    if(age=="all"){
+        DisplayCard(Data);
+    }else if(age=="desc"){
+        let descend=Data.sort((a,b)=> b.age-a.age);
+        DisplayCard(descend);
+    }else if(age=="asc"){
+        let descend=Data.sort((a,b)=> a.age-b.age);
+        DisplayCard(descend);
+    }
+   }
+      GetData();
+     
+      function GetData(){
+        fetch("http://localhost:8080/dogs", {
+            method: 'GET',
+            headers: {
+                "content-type": "application/json"
+            }
+        }).then((res)=> {
+            console.log(res)
+            if(!res.ok){
+               console.log("error")
+            }
+            return res.json();
+        }).then((data)=>{
+            Data=[...data];
+            DisplayCard(data)
+        })
+        .catch((err)=>{
+            console.log("Something went wrong")
+        })
+      }
+  
+ function DisplayCard(data){
+    document.querySelector(".container").innerHTML="";
+    data.forEach((el,i)=>{
+        let div=document.createElement("div");
+        let image=document.createElement("img");
+        image.setAttribute("src", "https://media.istockphoto.com/id/1328887289/photo/happy-dog.jpg?b=1&s=170667a&w=0&k=20&c=mp3L73BC14QUuk1EQaYtZ1-wwJRW9HAffcsGZNyMy_o=")
+        let name=document.createElement("h1");
+        name.innerText=el.name;
+        let age=document.createElement("h2");
+        age.innerText=el.age;
+        let place=document.createElement("p");
+        place.innerText=el.place;
+        let gender=document.createElement("p");
+        gender.innerText=el.gender;
+       
+        div.append(image,name,age,place,gender);
+        document.querySelector(".container").append(div)
+    })
+ }
+</script>

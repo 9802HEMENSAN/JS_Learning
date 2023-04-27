@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <H2>Register</H2>
+    <form id="register-form">
+        <label for="name">name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="age">Age</label>
+        <input type="number" id="age" name="age" required><br><br>
+        <label for="place">Place</label>
+        <input type="text" id="place" name="place" required><br><br>
+        <label for="Gender">Gender</label>
+        <input type="text" id="gender" name="gender" required><br><br>
+        <input type="submit" value="register">
+    </form>
+</body>
+
+</html>
+<script>
+    const name = document.querySelector("#name")
+    const age = document.querySelector("#age")
+    const place = document.querySelector("#place")
+    const gender = document.querySelector("#gender")
+    const registerform = document.querySelector("#register-form")
+
+    registerform.addEventListener("submit", e => {
+        e.preventDefault();
+        let obj = {
+            name: name.value,
+            age: age.value,
+            place: place.value,
+            gender: gender.value
+        }
+        console.log(obj);
+        // http://localhost:8080/dogs
+        RegisterForm(obj)
+    }
+    )
+
+    function RegisterForm(obj){
+        fetch("http://localhost:8080/dogs", {
+            method: 'POST',
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(obj)
+        }).then((res)=> {
+            console.log(res)
+            if(!res.ok){
+               console.log("error")
+            }
+            return res.json();
+        }).then((data)=>{
+            console.log(data);
+        })
+        .catch((err)=>{
+            console.log("Something went wrong")
+        })
+    }
+
+</script>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+  </head>
+  <body>
+    <h1>Login Page</h1>
+    <form id="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required><br><br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required><br><br>
+      <input type="submit" value="Login">
+    </form>
+    <div id="loading" style="display: none;">Loading...</div>
+    <div id="error" style="display: none;">Error: Invalid username or password.</div>
+    <script>
+      const  username = document.querySelector('#username');
+      const  password = document.querySelector('#password');
+      const loginForm = document.querySelector('#login-form');
+      const loadingDiv = document.querySelector('#loading');
+      const errorDiv = document.querySelector('#error');
+      loginForm.addEventListener('submit', e => {
+          e.preventDefault();
+        console.log(username.value,password.value);
+        let obj={
+            email : username.value,
+            password : password.value
+        }
+        loadingDiv.style.display = 'block';
+        errorDiv.style.display = 'none';
+        
+       
+        fetch('https://reqres.in/api/login', {
+            method: 'POST',
+           headers : {
+           "content-type" : "application/json"
+           },
+          body:  JSON.stringify(obj)
+        })
+        .then(res  => {
+            console.log(res)
+          if (!res.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then(data => {
+          if (data.token) {
+            localStorage.setItem("token", JSON.stringify(data.token) )
+            window.location.href = 'data.html';
+          } else {
+            errorDiv.style.display = 'block';
+          }
+        })
+        .catch(error => {
+          errorDiv.style.display = 'block';
+          console.error('Error:', error);
+        })
+        .finally(() => {
+          loadingDiv.style.display = 'none';
+        });
+      });
+    </script>
+  </body>
+</html>
